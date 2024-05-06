@@ -1,40 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>멀티플레이어 퍼즐 게임</title>
-  <style>
-    /* CSS 스타일을 추가할 수 있습니다. */
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roulette</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .roulette-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border: 10px solid #333;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .roulette {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: center center;
+            transition: transform 4s ease-out;
+        }
+        .roulette::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-top: 200px solid red;
+            border-right: 200px solid transparent;
+            border-bottom: 200px solid red;
+            border-left: 200px solid transparent;
+            border-radius: 50%;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 <body>
-  <h1>멀티플레이어 퍼즐 게임</h1>
-  
-  <div id="puzzle"></div>
-  <button onclick="shuffle()">섞기</button>
-  
-  <script>
-    // 퍼즐 조각 배열
-    var pieces = ["Piece 1", "Piece 2", "Piece 3", "Piece 4", "Piece 5", "Piece 6", "Piece 7", "Piece 8", ""];
-    
-    // 퍼즐 섞기 함수
-    function shuffle() {
-      // 퍼즐 조각 배열 섞기
-      for (var i = pieces.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = pieces[i];
-        pieces[i] = pieces[j];
-        pieces[j] = temp;
-      }
-      
-      // 퍼즐 조각 배열을 HTML에 적용
-      var puzzleElement = document.getElementById("puzzle");
-      puzzleElement.innerHTML = "";
-      for (var i = 0; i < pieces.length; i++) {
-        var pieceElement = document.createElement("div");
-        pieceElement.innerHTML = pieces[i];
-        puzzleElement.appendChild(pieceElement);
-      }
-    }
-  </script>
+    <div class="roulette-container">
+        <div class="roulette" id="roulette"></div>
+    </div>
+    <button onclick="startSpinning()">Spin</button>
+
+    <script>
+        function startSpinning() {
+            const roulette = document.getElementById('roulette');
+            roulette.style.transition = 'transform 4s ease-out';
+            roulette.style.transform = 'rotate(720deg)';
+
+            setTimeout(() => {
+                stopSpinning();
+            }, 2000);
+        }
+
+        function stopSpinning() {
+            const roulette = document.getElementById('roulette');
+            roulette.style.transition = 'transform 1s ease-in-out';
+            const rotation = Math.floor(Math.random() * 360) + 1080;
+            roulette.style.transform = `rotate(${rotation}deg)`;
+            setTimeout(() => {
+                showResult(rotation);
+            }, 1000);
+        }
+
+        function showResult(rotation) {
+            const sectors = ["Sector 1", "Sector 2", "Sector 3", "Sector 4", "Sector 5", "Sector 6"];
+            const sectorSize = 360 / sectors.length;
+            const sectorIndex = Math.floor((rotation % 360) / sectorSize);
+            alert(sectors[sectorIndex]);
+        }
+    </script>
 </body>
 </html>
