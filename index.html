@@ -28,7 +28,6 @@
             top: 0;
             left: 0;
             transform-origin: center center;
-            transition: transform 4s ease-out;
         }
         .roulette::before {
             content: "";
@@ -66,29 +65,60 @@
         <div class="roulette" id="roulette"></div>
     </div>
     <button onclick="startSpinning()">Spin</button>
+    <button onclick="stopSpinning()">Stop</button>
 
     <script>
-        function startSpinning() {
-            const roulette = document.getElementById('roulette');
-            roulette.style.transition = 'transform 4s ease-out';
-            roulette.style.transform = 'rotate(720deg)';
+        let spinning = false;
+        let rotation = 0;
+        let rotationSpeed = 10;
+        let interval;
 
-            setTimeout(() => {
-                stopSpinning();
-            }, 2000);
+        function startSpinning() {
+            if (!spinning) {
+                spinning = true;
+                rotation = 0;
+                interval = setInterval(rotateRoulette, 10); // 10ms마다 회전
+            }
+        }
+
+        function rotateRoulette() {
+            const roulette = document.getElementById('roulette');
+            rotation += rotationSpeed;
+            roulette.style.transform = `rotate(${rotation}deg)`;
         }
 
         function stopSpinning() {
-            const roulette = document.getElementById('roulette');
-            roulette.style.transition = 'transform 1s ease-in-out';
-            const rotation = Math.floor(Math.random() * 360) + 1080;
-            roulette.style.transform = `rotate(${rotation}deg)`;
-            setTimeout(() => {
-                showResult(rotation);
-            }, 1000);
+            if (spinning) {
+                clearInterval(interval); // 회전 멈춤
+                spinning = false;
+                slowDownRoulette(); // 서서히 멈추도록 호출
+            }
         }
 
-        function showResult(rotation) {
+        function slowDownRoulette() {
+            const roulette = document.getElementById('roulette');
+            const finalRotation = Math.floor(Math.random() * 360) + 1080; // 랜덤한 최종 회전 각도
+            const diff = finalRotation - rotation;
+            const deceleration = 0.98; // 감속도
+            const duration = 2000; // 감속 지속 시간 (ms)
+
+            function decelerate() {
+                if (Math.abs(diff) > 0.1) {
+                    rotation += diff / 50; // 회전 각도를 감속시킴
+                    roulette.style.transform = `rotate(${rotation}deg)`;
+                    diff = finalRotation - rotation;
+                    setTimeout(decelerate, 10);
+                } else {
+                    rotation = finalRotation;
+                    roulette.style.transform = `rotate(${rotation}deg)`;
+                    showResult();
+                }
+            }
+
+            decelerate();
+        }
+
+        function showResult() {
             const sectors = ["Sector 1", "Sector 2", "Sector 3", "Sector 4", "Sector 5", "Sector 6"];
             const sectorSize = 360 / sectors.length;
             const sectorIndex = Math.floor((rotation % 360) / sectorSize);
